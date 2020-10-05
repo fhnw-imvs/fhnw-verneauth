@@ -1,0 +1,95 @@
+# Copyright 2020 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+### Custom ###
+data/
+
+### Maven ###
+target/
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+
+### Eclipse ###
+bin/
+tmp/
+.settings/
+.externalToolBuilders/
+.recommenders/
+.apt_generated/
+.sts4-cache/
+.metadata
+.loadpath
+.recommenders
+.factorypath
+.target
+.tern-project
+.springBeans
+.cache-main
+.scala_dependencies
+.worksheet
+.project
+.classpath
+.apt_generated
+*.tmp
+*.bak
+*.swp
+*.launch
+*~.nib
+local.properties
+
+### Intellij ###
+out/
+.idea/
+.idea_modules/
+*.iws
+*.iml
+*.ipr
+atlassian-ide-plugin.xml
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+modules.xml
+
+### Windows ###
+*.stackdump
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+
+### macOS ###
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+.apdisk
+Network Trash Folder
+Temporary Items

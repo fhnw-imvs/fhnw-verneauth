@@ -1,0 +1,355 @@
+# Copyright 2020 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Authors: mluppi
+
+DELETE http://localhost:8080/api/stats/auth
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+> {%
+client.test("Clear statistics", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+GET http://localhost:8080/api/user
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+> {%
+client.test("Check initial user list", function() {
+  client.assert(response.status === 200, "");
+  client.assert(response.body != null, "");
+  var users = response.body;
+  for (i = 0; i < users.length; i++) {
+    client.assert(users[i].username === "stats-test-c101", "User 'stats-test-c101' should not be defined before running this script");
+    client.assert(users[i].username === "stats-test-c102", "User 'stats-test-c102' should not be defined before running this script");
+    client.assert(users[i].username === "stats-test-deny", "User 'stats-test-deny' should not be defined before running this script");
+  }
+});
+%}
+
+###
+POST http://localhost:8080/api/user
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "stats-test-c101",
+  "password": "grant",
+  "aclSubscribe": [
+    "#"
+  ],
+  "aclPublish": [
+    "#"
+  ]
+}
+
+> {%
+client.test("Create 'stats-test-c101' user", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+POST http://localhost:8080/api/user
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "stats-test-c102",
+  "password": "grant",
+  "aclSubscribe": [
+    "#"
+  ],
+  "aclPublish": [
+    "#"
+  ]
+}
+
+> {%
+client.test("Create 'stats-test-c102' user", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+POST http://localhost:8080/api/user
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "stats-test-deny",
+  "password": "empty-acl-to-always-deny"
+}
+
+> {%
+client.test("Create 'stats-test-deny' user", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+POST http://localhost:8080/webhooks/register
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "stats-test-c101",
+  "password": "grant"
+}
+
+> {%
+client.test("Login for 'stats-test-c101'", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+POST http://localhost:8080/webhooks/register
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "stats-test-c102",
+  "password": "grant"
+}
+
+> {%
+client.test("Login for 'stats-test-c102'", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+POST http://localhost:8080/webhooks/register
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "stats-test-deny",
+  "password": "wrong-password"
+}
+
+> {%
+client.test("Login for 'stats-test-deny'", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+POST http://localhost:8080/webhooks/subscribe
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "stats-test-c101",
+  "topics": [
+    {
+      "topic": "sub/grant/single/c101",
+      "qos": 1
+    }
+  ]
+}
+
+> {%
+client.test("Subscribe for 'stats-test-c101' to 'sub/grant/single/c101'", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+POST http://localhost:8080/webhooks/subscribe
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "stats-test-deny",
+  "topics": [
+    {
+      "topic": "sub/deny/single/a",
+      "qos": 1
+    }
+  ]
+}
+
+> {%
+client.test("Subscribe for 'stats-test-deny' to 'sub/deny/single/a'", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+POST http://localhost:8080/webhooks/subscribe
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "stats-test-deny",
+  "topics": [
+    {
+      "topic": "sub/deny/single/b",
+      "qos": 1
+    }
+  ]
+}
+
+> {%
+client.test("Subscribe for 'stats-test-deny' to 'sub/deny/single/b'", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+POST http://localhost:8080/webhooks/publish
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "stats-test-c101",
+  "topic": "pub/grant/multiple"
+}
+
+> {%
+client.test("Publish for 'stats-test-c101' to 'pub/grant/multiple'", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+POST http://localhost:8080/webhooks/publish
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "stats-test-c102",
+  "topic": "pub/grant/multiple"
+}
+
+> {%
+client.test("Publish for 'stats-test-c102' to 'pub/grant/multiple'", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+POST http://localhost:8080/webhooks/publish
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "stats-test-deny",
+  "topic": "pub/deny/single"
+}
+
+> {%
+client.test("Publish for 'stats-test-deny' to 'pub/deny/single'", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+DELETE http://localhost:8080/api/user/stats-test-c101
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+> {%
+client.test("Delete user 'stats-test-c101'", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+DELETE http://localhost:8080/api/user/stats-test-c102
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+> {%
+client.test("Delete user 'stats-test-c102'", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+DELETE http://localhost:8080/api/user/stats-test-deny
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+> {%
+client.test("Delete user 'stats-test-deny'", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+GET http://localhost:8080/api/stats/auth
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+> {%
+client.test("Get final statistics", function() {
+  client.assert(response.status === 200, "");
+
+  var grantedUserLogins = response.body.grantedUserLogins;
+  client.assert(grantedUserLogins["stats-test-c101"] > 0, "There should be a login time for 'stats-test-c101'");
+  client.assert(grantedUserLogins["stats-test-c102"] > 0, "There should be a login time for 'stats-test-c102'");
+
+  var subTopicSingleC101 = response.body.grantedSubscribeTopics["sub/grant/single/c101"];
+  client.assert(subTopicSingleC101.length === 1, "There should be exactly one user subscribed to 'sub/grant/single/c101'");
+  client.assert(subTopicSingleC101[0] === "stats-test-c101", "Only 'stats-test-c101' should subscribed to 'sub/grant/single/c101'");
+
+  var pubTopicMultiple = response.body.grantedPublishTopics["pub/grant/multiple"];
+  client.assert(pubTopicMultiple.length === 2, "Exactly two users should have published to 'pub/grant/multiple'");
+  for (i = 0; i < pubTopicMultiple.length; i++) {
+      client.assert(pubTopicMultiple[i] === "stats-test-c101" || pubTopicMultiple[i] === "stats-test-c102",
+        "Username should be 'stats-test-c101' or 'stats-test-c102'")
+  }
+
+  var deniedUserLogins = response.body.deniedUserLogins;
+  client.assert(deniedUserLogins["stats-test-deny"] > 0, "There should be a login time for 'stats-test-deny'");
+
+  var subTopicSingleDenyA = response.body.deniedSubscribeTopics["sub/deny/single/a"];
+  client.assert(subTopicSingleDenyA.length === 1, "There should be exactly one user denied subscription to 'sub/deny/single'");
+  client.assert(subTopicSingleDenyA[0] === "stats-test-deny", "Only 'stats-test-deny' should have been denied subscription to 'sub/deny/single'");
+
+  var subTopicSingleDenyB = response.body.deniedSubscribeTopics["sub/deny/single/b"];
+  client.assert(subTopicSingleDenyB.length === 1, "There should be exactly one user denied subscription to 'sub/deny/single'");
+  client.assert(subTopicSingleDenyB[0] === "stats-test-deny", "Only 'stats-test-deny' should have been denied subscription to 'sub/deny/single'");
+
+  var pubTopicSingleDeny = response.body.deniedPublishTopics["pub/deny/single"];
+  client.assert(pubTopicSingleDeny.length === 1, "There should be exactly one user denied subscription to 'pub/deny/single'");
+  client.assert(pubTopicSingleDeny[0] === "stats-test-deny", "Only 'stats-test-deny' should have been denied subscription to 'pub/deny/single'");
+});
+%}
+###

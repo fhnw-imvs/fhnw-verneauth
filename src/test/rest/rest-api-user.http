@@ -1,0 +1,260 @@
+# Copyright 2020 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Authors: mluppi
+
+GET http://localhost:8080/api/user
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+> {%
+client.test("Check initial user list", function() {
+  client.assert(response.status === 200, "");
+  client.assert(response.body != null, "");
+  var users = response.body;
+  for (i = 0; i < users.length; i++) {
+    client.assert(users[i].username === "xy", "User 'xy' should not be defined before running this script");
+    client.assert(users[i].username === "abc", "User 'abc' should not be defined before running this script");
+    client.assert(users[i].username === "c100", "User 'c100' should not be defined before running this script");
+  }
+});
+%}
+
+###
+POST http://localhost:8080/api/user
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "xy",
+  "password": "pass"
+}
+
+> {%
+client.test("Create user xy", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+PUT http://localhost:8080/api/user/xy
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+"username": "abc",
+"password": "pass"
+}
+
+> {%
+client.test("Rename user xy to abc", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+GET http://localhost:8080/api/user/xy
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+> {%
+client.test("Get user xy", function() {
+  client.assert(response.status === 404, "User should be renamed to xy and not exist anymore");
+});
+%}
+
+###
+GET http://localhost:8080/api/user/abc
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+> {%
+client.test("Get user abc", function() {
+  client.assert(response.status === 200, "User abc should exist");
+});
+%}
+
+###
+DELETE http://localhost:8080/api/user/abc
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+> {%
+client.test("Delete user abc", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+POST http://localhost:8080/api/user
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "c100",
+  "password": "asdf",
+  "aclSubscribe": [
+    "dt/measurement/%u/+",
+    "dt/status/%u/+"
+  ],
+  "aclPublish": [
+    "dt/measurement/%u/+",
+    "dt/status/%u/+"
+  ]
+}
+
+> {%
+client.test("Create user c100 with ACLs", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
+POST http://localhost:8080/webhooks/register
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "invalid",
+  "password": "asdf"
+}
+
+> {%
+client.test("Register with wrong credentials", function() {
+  client.assert(response.status === 200, "");
+  client.assert(response.body.result.error === "not_authorized", "Action should not be authorized");
+});
+%}
+
+###
+POST http://localhost:8080/webhooks/register
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "c100",
+  "password": "asdf"
+}
+
+> {%
+client.test("Register with correct credentials", function() {
+  client.assert(response.status === 200, "");
+  client.assert(response.body.result === "ok", "");
+});
+%}
+
+###
+POST http://localhost:8080/webhooks/subscribe
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "c100",
+  "topics": [
+    {
+      "topic": "dt/invalid",
+      "qos": 1
+    }
+  ]
+}
+
+> {%
+client.test("Subscribe to un-authorized topic", function() {
+  client.assert(response.status === 200, "");
+  client.assert(response.body.result.error === "not_authorized", "");
+});
+%}
+
+###
+POST http://localhost:8080/webhooks/subscribe
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "c100",
+  "topics": [
+    {
+      "topic": "dt/measurement/c100/+",
+      "qos": 1
+    }
+  ]
+}
+
+> {%
+client.test("Subscribe to authorized topic", function() {
+  client.assert(response.status === 200, "");
+  client.assert(response.body.result === "ok", "");
+});
+%}
+
+###
+POST http://localhost:8080/webhooks/publish
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "c100",
+  "topic": "dt/invalid"
+}
+
+> {%
+client.test("Publish to not un-authorized topic", function() {
+  client.assert(response.status === 200, "");
+  client.assert(response.body.result.error === "not_authorized", "");
+});
+%}
+
+###
+POST http://localhost:8080/webhooks/publish
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "username": "c100",
+  "topic": "dt/measurement/c100/+"
+}
+
+> {%
+client.test("Publish to not authorized topic", function() {
+  client.assert(response.status === 200, "");
+  client.assert(response.body.result === "ok", "");
+});
+%}
+
+###
+DELETE http://localhost:8080/api/user/c100
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+> {%
+client.test("Delete user c100", function() {
+  client.assert(response.status === 200, "");
+});
+%}
+
+###
