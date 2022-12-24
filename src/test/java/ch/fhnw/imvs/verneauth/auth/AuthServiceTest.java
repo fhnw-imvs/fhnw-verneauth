@@ -17,21 +17,19 @@ package ch.fhnw.imvs.verneauth.auth;
 
 import ch.fhnw.imvs.verneauth.persistence.MqttUser;
 import ch.fhnw.imvs.verneauth.persistence.MqttUserRepository;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the {@link AuthService}.
@@ -40,8 +38,7 @@ import static org.junit.Assert.assertTrue;
  */
 @SpringBootTest
 @ActiveProfiles("test")
-@RunWith(SpringRunner.class)
-public class AuthServiceTest {
+class AuthServiceTest {
 
     public static final String VALID_USER = "c100";
     public static final String INVALID_USER = "invalid-user";
@@ -57,7 +54,7 @@ public class AuthServiceTest {
     @MockBean
     private MqttUserRepository mqttUserRepository;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         final List<String> aclSubscribe = new ArrayList<>();
         aclSubscribe.add(VALID_TOPIC + "SUB1");
@@ -72,7 +69,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    public void isAuthorized() {
+    void isAuthorized() {
         assertTrue(authService.isLoginAuthorized(VALID_USER, VALID_PASSWORD));
         assertFalse(authService.isLoginAuthorized(VALID_USER, INVALID_PASSWORD));
         assertFalse(authService.isLoginAuthorized(INVALID_USER, VALID_PASSWORD));
@@ -82,7 +79,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    public void authorizeSubTopic() {
+    void authorizeSubTopic() {
         final List<String> validTopics = new ArrayList<>();
         validTopics.add(VALID_TOPIC + "SUB1");
 
@@ -118,7 +115,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    public void authorizePubTopic() {
+    void authorizePubTopic() {
         assertTrue(authService.isTopicPublishAuthorized(VALID_USER, VALID_TOPIC + "PUB1"));
         assertTrue(authService.isTopicPublishAuthorized(VALID_USER, VALID_TOPIC + "PUB2"));
         assertFalse(authService.isTopicPublishAuthorized(VALID_USER, INVALID_TOPIC));

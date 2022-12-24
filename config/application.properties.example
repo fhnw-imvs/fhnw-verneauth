@@ -1,0 +1,12 @@
+#######################################################################
+## Example application.properties
+#######################################################################
+
+## Custom properties for current environment (excluded from git)
+
+# Logging
+#logging.level.root = INFO
+#logging.level.ch.fhnw.imvs.verneauth=DEBUG
+
+# JPA / Hibernate
+#spring.jpa.show-sql = true

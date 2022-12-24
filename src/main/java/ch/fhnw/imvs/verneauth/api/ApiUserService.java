@@ -18,10 +18,10 @@ package ch.fhnw.imvs.verneauth.api;
 import ch.fhnw.imvs.verneauth.api.dto.UserDTO;
 import ch.fhnw.imvs.verneauth.persistence.MqttUser;
 import ch.fhnw.imvs.verneauth.persistence.MqttUserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 

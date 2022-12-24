@@ -15,10 +15,10 @@ limitations under the License.
 */
 package ch.fhnw.imvs.verneauth.auth;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the {@link MqttTopicMatcher}.
@@ -27,10 +27,10 @@ import static org.junit.Assert.assertTrue;
  * @see <a href="https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html">MQTT Version 5.0 - OASIS Standard</a>
  */
 @SuppressWarnings("squid:S1192")
-public class MqttTopicMatcherTest {
+class MqttTopicMatcherTest {
 
     @Test
-    public void testCompareWithoutWildcard() {
+    void testCompareWithoutWildcard() {
         assertTrue(MqttTopicMatcher.matchFilter("a", "a"));
         assertTrue(MqttTopicMatcher.matchFilter("aaa", "aaa"));
         assertTrue(MqttTopicMatcher.matchFilter("a/b/c", "a/b/c"));
@@ -44,7 +44,7 @@ public class MqttTopicMatcherTest {
     }
 
     @Test
-    public void testCompareSingleLevelWildcard() {
+    void testCompareSingleLevelWildcard() {
         assertTrue(MqttTopicMatcher.matchFilter("a/+", "a/b"));
         assertTrue(MqttTopicMatcher.matchFilter("+/b/c", "a/b/c"));
         assertTrue(MqttTopicMatcher.matchFilter("+/b/+/d", "a/b/c/d"));
@@ -64,7 +64,7 @@ public class MqttTopicMatcherTest {
     }
 
     @Test
-    public void testCompareMultiLevelWildcard() {
+    void testCompareMultiLevelWildcard() {
         assertTrue(MqttTopicMatcher.matchFilter("#", "a/b/c"));
         assertTrue(MqttTopicMatcher.matchFilter("#", "#"));
         assertTrue(MqttTopicMatcher.matchFilter("#", "a/#"));
@@ -78,7 +78,7 @@ public class MqttTopicMatcherTest {
     }
 
     @Test
-    public void testCompareCombinedWildcards() {
+    void testCompareCombinedWildcards() {
         assertTrue(MqttTopicMatcher.matchFilter("a/b/#", "a/b/+"));
         assertTrue(MqttTopicMatcher.matchFilter("a/b/#", "a/b/c/+"));
         assertTrue(MqttTopicMatcher.matchFilter("+/b/#", "a/b/c/d")); // no match on third level
@@ -86,7 +86,7 @@ public class MqttTopicMatcherTest {
     }
 
     @Test
-    public void testCompareTopicsBeginningWithDollar() {
+    void testCompareTopicsBeginningWithDollar() {
         assertTrue(MqttTopicMatcher.matchFilter("$SYS/#", "$SYS/"));
         assertTrue(MqttTopicMatcher.matchFilter("$SYS/#", "$SYS/a"));
         assertTrue(MqttTopicMatcher.matchFilter("$SYS/#", "$SYS/a/+"));
@@ -102,13 +102,13 @@ public class MqttTopicMatcherTest {
     }
 
     @Test
-    public void testCompareCaseSensitivity() {
+    void testCompareCaseSensitivity() {
         assertTrue(MqttTopicMatcher.matchFilter("A/b/CCC", "A/b/CCC"));
         assertFalse(MqttTopicMatcher.matchFilter("A/b/CCC", "A/b/ccc"));
     }
 
     @Test
-    public void testCompareEmptyLevels() {
+    void testCompareEmptyLevels() {
         assertTrue(MqttTopicMatcher.matchFilter("a//c", "a//c"));
         assertTrue(MqttTopicMatcher.matchFilter("/b/c", "/b/c"));
         assertTrue(MqttTopicMatcher.matchFilter("+/b/c", "/b/c"));
@@ -121,7 +121,7 @@ public class MqttTopicMatcherTest {
     }
 
     @Test
-    public void testCompareUTF8() {
+    void testCompareUTF8() {
         assertTrue(MqttTopicMatcher.matchFilter("a/!*ç/öäé", "a/!*ç/öäé"));
         assertTrue(MqttTopicMatcher.matchFilter("a/!*ç/+", "a/!*ç/öäé"));
         assertTrue(MqttTopicMatcher.matchFilter("a/+/öäé", "a/!*ç/öäé"));
