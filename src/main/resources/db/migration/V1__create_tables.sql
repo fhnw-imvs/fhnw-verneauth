@@ -1,4 +1,4 @@
--- Copyright 2020 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+-- Copyright 2020-2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
 --
 -- Licensed under the Apache License, Version 2.0 (the "License");
 -- you may not use this file except in compliance with the License.

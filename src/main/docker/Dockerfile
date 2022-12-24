@@ -1,4 +1,4 @@
-# Copyright 2020 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+# Copyright 2020-2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,11 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM openjdk:8-jdk-alpine
-ADD target/verneauth-*.jar /opt/verneauth/verneauth.jar
+FROM eclipse-temurin:17-jre-alpine as extractor
+WORKDIR application
+COPY target/*.jar verneauth.jar
+RUN java -Djarmode=layertools -jar verneauth.jar extract
+
+
+FROM eclipse-temurin:17-jre-alpine
+
 WORKDIR /opt/verneauth/
+
+COPY --from=extractor /application/spring-boot-loader/ ./
+COPY --from=extractor /application/dependencies/ ./
+COPY --from=extractor /application/snapshot-dependencies/ ./
+COPY --from=extractor /application/application/ ./
 
 EXPOSE 8080
 
-# use of "exec" see: https://stackoverflow.com/questions/31836498/sigterm-not-received-by-java-process-using-docker-stop-and-the-official-java-i
-CMD exec java -jar verneauth.jar
+ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]

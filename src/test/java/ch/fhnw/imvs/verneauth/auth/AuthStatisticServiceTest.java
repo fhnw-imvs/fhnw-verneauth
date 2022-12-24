@@ -1,5 +1,5 @@
 /*
-Copyright 2020 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+Copyright 2020-2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,21 +15,19 @@ limitations under the License.
 */
 package ch.fhnw.imvs.verneauth.auth;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the {@link AuthStatisticService}.
@@ -38,19 +36,18 @@ import static org.junit.Assert.assertTrue;
  */
 @SpringBootTest
 @ActiveProfiles("test")
-@RunWith(SpringRunner.class)
-public class AuthStatisticServiceTest {
+class AuthStatisticServiceTest {
 
     @Autowired
     private AuthStatisticService authStatisticService;
 
-    @Before
+    @BeforeEach
     public void clearStatistic() {
         authStatisticService.clearStatistic();
     }
 
     @Test
-    public void testGrantedLoginTimeByUsername() {
+    void testGrantedLoginTimeByUsername() {
         authStatisticService.logLoginTime("A", true);
         authStatisticService.logLoginTime("B", true);
         final Map<String, Long> loginTimes = authStatisticService.getGrantedLoginTimeByUsername();
@@ -59,7 +56,7 @@ public class AuthStatisticServiceTest {
     }
 
     @Test
-    public void testDeniedLoginTimeByUsername() {
+    void testDeniedLoginTimeByUsername() {
         authStatisticService.logLoginTime("A", false);
         authStatisticService.logLoginTime("B", false);
         final Map<String, Long> loginTimes = authStatisticService.getDeniedLoginTimeByUsername();
@@ -68,7 +65,7 @@ public class AuthStatisticServiceTest {
     }
 
     @Test
-    public void testGrantedUsernameBySubscribeTopic() {
+    void testGrantedUsernameBySubscribeTopic() {
         authStatisticService.logSubscribeTopic("A", "a/t1", true);
         authStatisticService.logSubscribeTopic("A", "a/t2", true);
         authStatisticService.logSubscribeTopic("B", "b/t3", true);
@@ -93,7 +90,7 @@ public class AuthStatisticServiceTest {
     }
 
     @Test
-    public void testGrantedUsernameByPublishTopic() {
+    void testGrantedUsernameByPublishTopic() {
         authStatisticService.logPublishTopic("A", "a/t1", true);
         authStatisticService.logPublishTopic("A", "a/t2", true);
         authStatisticService.logPublishTopic("B", "b/t3", true);
@@ -117,9 +114,8 @@ public class AuthStatisticServiceTest {
         assertTrue(bt3.contains("B"));
     }
 
-
     @Test
-    public void testDeniedUsernameBySubscribeTopic() {
+    void testDeniedUsernameBySubscribeTopic() {
         authStatisticService.logSubscribeTopic("A", "a/t1", false);
         authStatisticService.logSubscribeTopic("A", "a/t2", false);
         authStatisticService.logSubscribeTopic("B", "b/t3", false);
@@ -144,7 +140,7 @@ public class AuthStatisticServiceTest {
     }
 
     @Test
-    public void testDeniedUsernameByPublishTopic() {
+    void testDeniedUsernameByPublishTopic() {
         authStatisticService.logPublishTopic("A", "a/t1", false);
         authStatisticService.logPublishTopic("A", "a/t2", false);
         authStatisticService.logPublishTopic("B", "b/t3", false);
@@ -169,7 +165,7 @@ public class AuthStatisticServiceTest {
     }
 
     @Test
-    public void testClearStatistic() {
+    void testClearStatistic() {
         authStatisticService.logLoginTime("A", true);
         authStatisticService.clearStatistic();
         final Map<String, Long> loginTimes = authStatisticService.getGrantedLoginTimeByUsername();

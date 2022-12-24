@@ -82,11 +82,6 @@ Build the Docker image after building the JAR:
 docker build --no-cache -t <tag-name> -f ./src/main/docker/Dockerfile .
 ```
 
-Build the Docker image directly with a multistage build:
-```
-docker build --no-cache -t <tag-name> -f ./src/main/docker/Dockerfile-maven-multistage .
-```
-
 ## Run with Docker
 * Add port-mapping for port 8080 if necessary.
 * The H2-database is persisted in the directory `/opt/verneauth/data` and can be mapped as a volume.
@@ -95,7 +90,6 @@ docker build --no-cache -t <tag-name> -f ./src/main/docker/Dockerfile-maven-mult
 ```
 docker run -v verneauth-data-volume:/opt/verneauth/data -p 8080:8080 <tag-name>
 ```
-
 
 
 ## License

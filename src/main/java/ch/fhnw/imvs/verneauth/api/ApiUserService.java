@@ -1,5 +1,5 @@
 /*
-Copyright 2020 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
+Copyright 2020-2022 FHNW (University of Applied Sciences and Arts Northwestern Switzerland)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package ch.fhnw.imvs.verneauth.api;
 import ch.fhnw.imvs.verneauth.api.dto.UserDTO;
 import ch.fhnw.imvs.verneauth.persistence.MqttUser;
 import ch.fhnw.imvs.verneauth.persistence.MqttUserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
